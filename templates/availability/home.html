@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}Главная - Проверка доступности{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h2>Проверить доступность аудитории</h2>
+    <p>Укажите параметры для проверки доступности аудитории</p>
+</div>
+
+<div class="check-form-container">
+    <form method="post" class="check-form" id="checkForm">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="room_number">Номер аудитории *</label>
+            <select id="room_number" name="room_number" required class="form-control">
+                <option value="">Выберите аудиторию</option>
+                {% for room in rooms %}
+                <option value="{{ room.number }}">{{ room.number }} ({{ room.capacity }} мест)</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="booking_date">Дата *</label>
+                <input 
+                    type="date" 
+                    id="booking_date" 
+                    name="booking_date" 
+                    required
+                    min="{{ today|date:'Y-m-d' }}"
+                    class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="start_time">Время начала *</label>
+                <input 
+                    type="time" 
+                    id="start_time" 
+                    name="start_time" 
+                    required
+                    class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="end_time">Время окончания *</label>
+                <input 
+                    type="time" 
+                    id="end_time" 
+                    name="end_time" 
+                    required
+                    class="form-control">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="booking_type">Тип бронирования *</label>
+            <select id="booking_type" name="booking_type" required class="form-control">
+                <option value="lesson">Занятие</option>
+                <option value="exam">Экзамен</option>
+                <option value="meeting">Собрание</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            🔍 Проверить доступность
+        </button>
+    </form>
+</div>
+
+<div class="info-section">
+    <h3>📋 Правила бронирования</h3>
+    <div class="rules-grid">
+        <div class="rule-card">
+            <div class="rule-icon">⏰</div>
+            <h4>Рабочее время</h4>
+            <p>Аудитории доступны с 08:00 до 20:00</p>
+        </div>
+        <div class="rule-card">
+            <div class="rule-icon">📚</div>
+            <h4>Занятия</h4>
+            <p>Могут начинаться с 08:00 до 18:00</p>
+        </div>
+        <div class="rule-card">
+            <div class="rule-icon">📝</div>
+            <h4>Экзамены</h4>
+            <p>Минимум 2 часа бронирования</p>
+        </div>
+        <div class="rule-card">
+            <div class="rule-icon">👥</div>
+            <h4>Собрания</h4>
+            <p>Максимум 4 часа</p>
+        </div>
+    </div>
+</div>
+
+{% if recent_checks %}
+<div class="recent-section">
+    <h3>Последние проверки в расписании</h3>
+    <div class="schedule-grid">
+        {% for schedule in recent_checks %}
+        <div class="schedule-card">
+            <div class="schedule-header">
+                <span class="room-badge">🚪 {{ schedule.room_number }}</span>
+                <span class="type-badge type-{{ schedule.booking_type }}">
+                    {{ schedule.get_booking_type_display }}
+                </span>
+            </div>
+            <div class="schedule-info">
+                <p>📅 {{ schedule.booking_date|date:"d.m.Y" }}</p>
+                <p>⏰ {{ schedule.start_time|time:"H:i" }} - {{ schedule.end_time|time:"H:i" }}</p>
+                <p>👤 {{ schedule.booked_by }}</p>
+            </div>
+            <a href="{% url 'schedule_detail' schedule.pk %}" class="btn btn-sm">Подробнее</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div class="quick-stats">
+    <h3>📊 Статистика</h3>
+    <div class="stats-grid">
+        <div class="stat-box">
+            <div class="stat-number">{{ rooms.count }}</div>
+            <div class="stat-label">Аудиторий</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">{{ recent_checks.count }}</div>
+            <div class="stat-label">Бронирований</div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавить бронирование{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Добавить бронирование в расписание</h2>
+    <a href="{% url 'schedule_list' %}" class="btn btn-secondary">← Назад</a>
+</div>
+
+<div class="booking-form-container">
+    <form method="post" class="booking-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="room_number">Номер аудитории *</label>
+            <select id="room_number" name="room_number" required class="form-control">
+                <option value="">Выберите аудиторию</option>
+                {% for room in rooms %}
+                <option value="{{ room.number }}">{{ room.number }} ({{ room.capacity }} мест)</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="booking_date">Дата *</label>
+                <input type="date" id="booking_date" name="booking_date" required min="{{ today|date:'Y-m-d' }}" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="start_time">Время начала *</label>
+                <input type="time" id="start_time" name="start_time" required class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="end_time">Время окончания *</label>
+                <input type="time" id="end_time" name="end_time" required class="form-control">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="booking_type">Тип бронирования *</label>
+            <select id="booking_type" name="booking_type" required class="form-control">
+                <option value="lesson">Занятие</option>
+                <option value="exam">Экзамен</option>
+                <option value="meeting">Собрание</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="booked_by">Email *</label>
+            <input type="email" id="booked_by" name="booked_by" required placeholder="user@example.com" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label for="description">Описание</label>
+            <textarea id="description" name="description" rows="3" placeholder="Описание бронирования..." class="form-control"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            ✅ Добавить бронирование
+        </button>
+    </form>
+</div>
+
+{% endblock %}

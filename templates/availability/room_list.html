@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Список аудиторий{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Аудитории</h2>
+    <div class="stats">
+        <div class="stat-item">
+            <span class="stat-number">{{ total_rooms }}</span>
+            <span class="stat-label">Всего</span>
+        </div>
+        <div class="stat-item stat-success">
+            <span class="stat-number">{{ active_rooms }}</span>
+            <span class="stat-label">Активных</span>
+        </div>
+    </div>
+</div>
+
+<div class="filters">
+    <form method="get" class="filter-form">
+        <select name="is_active" class="form-control">
+            <option value="">Все аудитории</option>
+            <option value="true" {% if request.GET.is_active == 'true' %}selected{% endif %}>Только активные</option>
+            <option value="false" {% if request.GET.is_active == 'false' %}selected{% endif %}>Неактивные</option>
+        </select>
+        
+        <button type="submit" class="btn btn-primary">Фильтр</button>
+        <a href="{% url 'room_list' %}" class="btn btn-secondary">Сбросить</a>
+    </form>
+</div>
+
+{% if rooms %}
+<div class="rooms-grid">
+    {% for room in rooms %}
+    <div class="room-card {% if not room.is_active %}inactive{% endif %}">
+        <div class="room-header">
+            <h3>🚪 Аудитория {{ room.number }}</h3>
+            {% if room.is_active %}
+            <span class="status-badge status-active">Активна</span>
+            {% else %}
+            <span class="status-badge status-inactive">Неактивна</span>
+            {% endif %}
+        </div>
+        <div class="room-body">
+            <div class="room-info">
+                <p><strong>Вместимость:</strong> {{ room.capacity }} человек</p>
+                {% if room.equipment %}
+                <p><strong>Оборудование:</strong> {{ room.equipment|truncatewords:10 }}</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="room-footer">
+            <a href="{% url 'room_detail' room.pk %}" class="btn btn-primary">Подробнее</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if is_paginated %}
+<div class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page=1" class="btn btn-sm">Первая</a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-sm">← Назад</a>
+    {% endif %}
+    
+    <span class="page-info">
+        Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+    </span>
+    
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="btn btn-sm">Далее →</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-sm">Последняя</a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<div class="empty-state">
+    <p>📭 Аудитории не найдены</p>
+</div>
+{% endif %}
+
+{% endblock %}

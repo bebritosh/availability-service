@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Бронирование #{{ schedule.id }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Детали бронирования #{{ schedule.id }}</h2>
+    <div class="header-actions">
+        <a href="{% url 'schedule_list' %}" class="btn btn-secondary">← К списку</a>
+        <form method="post" action="{% url 'schedule_delete' schedule.pk %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">🗑️ Удалить</button>
+        </form>
+    </div>
+</div>
+
+<div class="detail-card">
+    <div class="card-header">
+        <h3>Информация о бронировании</h3>
+        <span class="type-badge type-{{ schedule.booking_type }}">{{ schedule.get_booking_type_display }}</span>
+    </div>
+    
+    <div class="card-body">
+        <div class="info-grid">
+            <div class="info-item">
+                <label>🚪 Аудитория</label>
+                <value>{{ schedule.room_number }}</value>
+            </div>
+            
+            <div class="info-item">
+                <label>📅 Дата</label>
+                <value>{{ schedule.booking_date|date:"d.m.Y (l)" }}</value>
+            </div>
+            
+            <div class="info-item">
+                <label>⏰ Время начала</label>
+                <value>{{ schedule.start_time|time:"H:i" }}</value>
+            </div>
+            
+            <div class="info-item">
+                <label>⏰ Время окончания</label>
+                <value>{{ schedule.end_time|time:"H:i" }}</value>
+            </div>
+            
+            <div class="info-item">
+                <label>👤 Email</label>
+                <value>{{ schedule.booked_by }}</value>
+            </div>
+            
+            <div class="info-item">
+                <label>📋 Тип</label>
+                <value>{{ schedule.get_booking_type_display }}</value>
+            </div>
+            
+            {% if schedule.description %}
+            <div class="info-item full-width">
+                <label>📝 Описание</label>
+                <value>{{ schedule.description }}</value>
+            </div>
+            {% endif %}
+            
+            <div class="info-item">
+                <label>🕐 Создано</label>
+                <value>{{ schedule.created_at|date:"d.m.Y H:i" }}</value>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

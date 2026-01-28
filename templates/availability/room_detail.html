@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block title %}Аудитория {{ room.number }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>Аудитория {{ room.number }}</h2>
+    <div class="header-actions">
+        <a href="{% url 'room_list' %}" class="btn btn-secondary">← К списку</a>
+    </div>
+</div>
+
+<div class="detail-card">
+    <div class="card-header">
+        <h3>Информация об аудитории</h3>
+        {% if room.is_active %}
+        <span class="status-badge status-active">Активна</span>
+        {% else %}
+        <span class="status-badge status-inactive">Неактивна</span>
+        {% endif %}
+    </div>
+    
+    <div class="card-body">
+        <div class="info-grid">
+            <div class="info-item">
+                <label>🚪 Номер</label>
+                <value>{{ room.number }}</value>
+            </div>
+            
+            <div class="info-item">
+                <label>👥 Вместимость</label>
+                <value>{{ room.capacity }} человек</value>
+            </div>
+            
+            {% if room.equipment %}
+            <div class="info-item full-width">
+                <label>💻 Оборудование</label>
+                <value>{{ room.equipment }}</value>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if working_hours %}
+<div class="detail-card">
+    <div class="card-header">
+        <h3>Рабочие часы</h3>
+    </div>
+    <div class="card-body">
+        <table class="simple-table">
+            <thead>
+                <tr>
+                    <th>День недели</th>
+                    <th>Время работы</th>
+                    <th>Статус</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for wh in working_hours %}
+                <tr>
+                    <td>{{ wh.get_weekday_display }}</td>
+                    <td>{{ wh.start_time|time:"H:i" }} - {{ wh.end_time|time:"H:i" }}</td>
+                    <td>
+                        {% if wh.is_working %}
+                        <span class="badge badge-success">Работает</span>
+                        {% else %}
+                        <span class="badge badge-danger">Выходной</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+{% if schedule %}
+<div class="detail-card">
+    <div class="card-header">
+        <h3>Ближайшие бронирования</h3>
+    </div>
+    <div class="card-body">
+        <table class="simple-table">
+            <thead>
+                <tr>
+                    <th>Дата</th>
+                    <th>Время</th>
+                    <th>Тип</th>
+                    <th>Кто забронировал</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in schedule %}
+                <tr>
+                    <td>{{ item.booking_date|date:"d.m.Y" }}</td>
+                    <td>{{ item.start_time|time:"H:i" }} - {{ item.end_time|time:"H:i" }}</td>
+                    <td><span class="type-badge type-{{ item.booking_type }}">{{ item.get_booking_type_display }}</span></td>
+                    <td>{{ item.booked_by }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
